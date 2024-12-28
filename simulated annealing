@@ -1,0 +1,66 @@
+import math
+import random
+
+def simulated_annealing(objective_function, bounds, max_iterations, initial_temperature, cooling_rate):
+
+    # Initialize the solution
+    current_solution = random.uniform(bounds[0], bounds[1])
+    current_objective = objective_function(current_solution)
+    best_solution = current_solution
+    best_objective = current_objective
+
+    # Current temperature
+    temperature = initial_temperature
+
+    for iteration in range(max_iterations):
+        # Generate a new candidate solution
+        candidate_solution = current_solution + random.uniform(-1, 1)
+
+        # Ensure the candidate solution is within bounds
+        candidate_solution = max(bounds[0], min(bounds[1], candidate_solution))
+        candidate_objective = objective_function(candidate_solution)
+
+        # Calculate the acceptance probability
+        delta_objective = candidate_objective - current_objective
+        acceptance_probability = math.exp(-delta_objective / temperature) if delta_objective > 0 else 1.0
+
+        # Decide whether to accept the new candidate
+        if random.random() < acceptance_probability:
+            current_solution = candidate_solution
+            current_objective = candidate_objective
+
+            # Update the best solution found so far
+            if current_objective < best_objective:
+                best_solution = current_solution
+                best_objective = current_objective
+
+        # Cool down the temperature
+        temperature *= cooling_rate
+
+        # Optional: Print progress
+        print(f"Iteration {iteration + 1}: Best Solution = {best_solution}, Best Objective = {best_objective}")
+
+        # Stop early if the temperature is very low
+        if temperature < 1e-8:
+            break
+
+    return best_solution, best_objective
+
+
+# Example usage:
+if __name__ == "__main__":
+    # Define the objective function
+    def objective_function(x):
+        return x ** 2
+
+    # Define the bounds and parameters
+    bounds = (-10, 10)
+    max_iterations = 10
+    initial_temperature = 100.0
+    cooling_rate = 0.95
+
+    # Run the simulated annealing algorithm
+    best_solution, best_objective = simulated_annealing(objective_function, bounds, max_iterations, initial_temperature, cooling_rate)
+
+    print(f"\nFinal Best Solution: {best_solution}")
+    print(f"Final Best Objective: {best_objective}")
