@@ -1,0 +1,97 @@
+class Node:
+    def __init__(self, data, level, fval):
+        self.data = data
+        self.level = level  # g(n) - cost to reach this node
+        self.fval = fval    # f(n) - total estimated cost
+
+    def generate_child(self):
+        x, y = self.find(self.data, '_')
+        val_list = [[x, y-1], [x, y+1], [x-1, y], [x+1, y]]
+        children = []
+
+        for i in val_list:
+            child = self.shuffle(self.data, x, y, i[0], i[1])
+            if child is not None:
+                child_node = Node(child, self.level + 1, 0)
+                children.append(child_node)
+        return children
+
+    def shuffle(self, puzzle, x1, y1, x2, y2):
+        if 0 <= x2 < len(puzzle) and 0 <= y2 < len(puzzle):
+            temp_puz = self.copy(puzzle)
+            temp_puz[x2][y2], temp_puz[x1][y1] = temp_puz[x1][y1], temp_puz[x2][y2]
+            return temp_puz
+        return None
+
+    def copy(self, root):
+        return [row[:] for row in root]
+
+    def find(self, puzzle, x):
+        for i in range(len(puzzle)):
+            for j in range(len(puzzle)):
+                if puzzle[i][j] == x:
+                    return i, j
+
+
+class Puzzle:
+    def __init__(self, size):
+        self.n = size
+        self.open = []
+        self.closed = []
+
+    def accept(self):
+        puz = []
+        for _ in range(self.n):
+            temp = input().split()
+            puz.append(temp)
+        return puz
+
+    def f(self, start, goal):
+        return self.h(start.data, goal) + start.level  # f(n) = g(n) + h(n)
+
+    def h(self, start, goal):
+        distance = 0
+        for i in range(self.n):
+            for j in range(self.n):
+                if start[i][j] != '_' and start[i][j] != goal[i][j]:
+                    goal_x = (int(start[i][j]) - 1) // self.n
+                    goal_y = (int(start[i][j]) - 1) % self.n
+                    distance += abs(i - goal_x) + abs(j - goal_y)
+        return distance
+
+    def process(self):
+        print("Enter the start state matrix:")
+        start = self.accept()
+        print("Enter the goal state matrix:")
+        goal = self.accept()
+
+        start_node = Node(start, 0, 0)
+        start_node.fval = self.f(start_node, goal)
+        self.open.append(start_node)
+
+        while self.open:
+            self.open.sort(key=lambda x: x.fval)
+            current_node = self.open.pop(0)
+            g_value = current_node.level
+            h_value = self.h(current_node.data, goal)
+            f_value = current_node.fval
+
+            print("Current state:")
+            for row in current_node.data:
+                print(" ".join(row))
+            print(f"g(n) = {g_value}, h(n) = {h_value}, f(n) = {f_value}")
+            print()
+
+            if h_value == 0:
+                print("Goal state reached!")
+                return
+
+            for child in current_node.generate_child():
+                child.fval = self.f(child, goal)
+                if child not in self.closed:
+                    self.open.append(child)
+            self.closed.append(current_node)
+
+if __name__ == "__main__":
+    puzzle = Puzzle(3)
+    puzzle.process()
