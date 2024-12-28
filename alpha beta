@@ -1,0 +1,49 @@
+MAX, MIN = 1000, -1000
+
+def minimax(depth, nodeIndex, maximizingPlayer, values, alpha, beta):
+    # If we've reached the leaf node (depth == 3), return the value at the node
+    if depth == 3:
+        print(f"Depth {depth} - Leaf node reached. Returning value {values[nodeIndex]} at node index {nodeIndex}")
+        return values[nodeIndex]
+
+    # Maximizing player
+    if maximizingPlayer:
+        best = MIN
+        print(f"Depth {depth} - Maximizing Player (alpha={alpha}, beta={beta})")
+
+        for i in range(0, 2):  # We assume binary tree, so two children per node
+            val = minimax(depth + 1, nodeIndex * 2 + i, False, values, alpha, beta)  # Call minimax recursively for the child
+            best = max(best, val)
+            alpha = max(alpha, best)
+
+            # Print the decision making process
+            print(f"Depth {depth} - Maximizing Player: Best so far {best} (alpha={alpha})")
+
+            if beta <= alpha:  # Prune if alpha >= beta
+                print(f"Depth {depth} - Pruning branch (beta <= alpha) with alpha={alpha}, beta={beta}")
+                break
+
+        return best
+
+    # Minimizing player
+    else:
+        best = MAX
+        print(f"Depth {depth} - Minimizing Player (alpha={alpha}, beta={beta})")
+
+        for i in range(0, 2):  # We assume binary tree, so two children per node
+            val = minimax(depth + 1, nodeIndex * 2 + i, True, values, alpha, beta)  # Call minimax recursively for the child
+            best = min(best, val)
+            beta = min(beta, best)
+
+            # Print the decision making process
+            print(f"Depth {depth} - Minimizing Player: Best so far {best} (beta={beta})")
+
+            if beta <= alpha:  # Prune if alpha >= beta
+                print(f"Depth {depth} - Pruning branch (beta <= alpha) with alpha={alpha}, beta={beta}")
+                break
+
+        return best
+
+if __name__ == "__main__":
+    values = [10, 9, 14, 18, 5, 4, 50, 3]  # The values at the leaf nodes of the tree
+    print("\nThe optimal value is:", minimax(0, 0, True, values, MIN, MAX))  # Call the minimax function
