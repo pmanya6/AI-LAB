@@ -1,0 +1,63 @@
+import math
+# Constants for players HUMAN = 'O' # Minimizer AI = 'X'	# Maximizer
+# Initialize empty board def create_board():
+return [[' ' for _ in range(3)] for _ in range(3)] # Check if there are any moves left on the board def is_moves_left(board):
+for row in board: if ' ' in row:
+return True return False
+# Check for a win condition def evaluate(board):
+# Rows, columns, diagonals check for row in board:
+if row[0] == row[1] == row[2] and row[0] != ' ': return 1 if row[0] == AI else -1
+for col in range(3):
+if board[0][col] == board[1][col] == board[2][col] and board[0][col] != ' ': return 1 if board[0][col] == AI else -1
+if board[0][0] == board[1][1] == board[2][2] and board[0][0] != ' ': return 1 if board[0][0] == AI else -1
+if board[0][2] == board[1][1] == board[2][0] and board[0][2] != ' ': return 1 if board[0][2] == AI else -1
+return 0 # No winner
+# Minimax algorithm with Alpha-Beta Pruning
+def minimax(board, depth, is_maximizing, alpha, beta): score = evaluate(board)
+# Terminal condition
+ 
+if score == 1: # AI wins
+return score - depth # Prefer quicker wins if score == -1: # Human wins
+return score + depth # Prefer slower losses if not is_moves_left(board): # Draw
+return 0
+if is_maximizing: best = -math.inf for i in range(3):
+for j in range(3):
+if board[i][j] == ' ': board[i][j] = AI
+best = max(best, minimax(board, depth + 1, False, alpha, beta)) board[i][j] = ' '
+alpha = max(alpha, best) if beta <= alpha:
+break return best
+else:
+best = math.inf for i in range(3):
+for j in range(3):
+if board[i][j] == ' ': board[i][j] = HUMAN
+best = min(best, minimax(board, depth + 1, True, alpha, beta)) board[i][j] = ' '
+beta = min(beta, best) if beta <= alpha:
+break return best
+# Find the best move for the AI def find_best_move(board):
+ 
+best_val = -math.inf best_move = (-1, -1) for i in range(3):
+for j in range(3):
+if board[i][j] == ' ': board[i][j] = AI
+move_val = minimax(board, 0, False, -math.inf, math.inf) board[i][j] = ' '
+if move_val > best_val: best_val = move_val best_move = (i, j)
+return best_move # Print the board
+def print_board(board): for row in board:
+print('|'.join(row))
+print('-' * 5)
+# Example usage
+if  name	== ' main ': board = create_board() while is_moves_left(board):
+print_board(board)
+# Human makes a move
+row, col = map(int, input("Enter row and column (0, 1, 2): ").split()) if board[row][col] == ' ':
+board[row][col] = HUMAN else:
+print("Invalid move! Try again.") continue
+if evaluate(board) != 0 or not is_moves_left(board): break
+# AI makes a move
+ 
+print("AI is making a move...") ai_move = find_best_move(board) board[ai_move[0]][ai_move[1]] = AI
+if evaluate(board) != 0 or not is_moves_left(board): break
+
+# Final result print_board(board) result = evaluate(board) if result == 1:
+print("AI wins!") elif result == -1:
+print("Human wins!") else:
+print("It's a draw!") print("P Manya") print("1BM22CS187")
