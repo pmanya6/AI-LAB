@@ -1,0 +1,37 @@
+class PuzzleState:
+def  init (self, board, empty_pos, moves=[]): self.board = board
+self.empty_pos = empty_pos self.moves = moves
+def is_goal(self):
+return self.board == [1, 2, 3, 4, 5, 6, 7, 8, 0] def get_possible_moves(self):
+x, y = self.empty_pos moves = []
+for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+nx, ny = x + dx, y + dy
+if 0 <= nx < 3 and 0 <= ny < 3: new_board = self.board[:]
+new_board[x * 3 + y], new_board[nx * 3 + ny] = new_board[nx * 3 + ny], new_board[x * 3
+ 
++ y]
+ 
+
+moves.append((new_board, (nx, ny))) return moves
+ 
+def dfs(initial_state):
+stack, visited = [initial_state], set() while stack:
+current_state = stack.pop() if current_state.is_goal():
+return current_state.moves visited.add(tuple(current_state.board))
+for new_board, new_empty_pos in current_state.get_possible_moves():
+new_state = PuzzleState(new_board, new_empty_pos, current_state.moves + [new_board]) if tuple(new_board) not in visited:
+stack.append(new_state) return None
+def print_matrix(board):
+ 
+for i in range(0, 9, 3):
+print(board[i:i + 3]) print()
+def main():
+initial_board = [1, 2, 3, 4, 0, 5, 7, 8, 6] empty_pos = initial_board.index(0)
+initial_state = PuzzleState(initial_board, (empty_pos // 3, empty_pos % 3)) print("Initial state:")
+print_matrix(initial_board) solution = dfs(initial_state) if solution:
+print("Solution found:") for step in solution:
+print_matrix(step)
+else:
+print("No solution found.") if  name	== " main ":
+main()
+print(“P Manya”) print(“1BM22CS187”)
