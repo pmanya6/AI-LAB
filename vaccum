@@ -1,83 +1,63 @@
-def clean(floor):
-    i, j, row, col = 0, 0, len(floor), len(floor[0])
-    for i in range(row):
-        if(i%2 == 0):
-            for j in range(col):
-                if(floor[i][j] == 1):
-                    print_F(floor, i, j)
-                    floor[i][j] = 0
-                print_F(floor, i, j)
-        else:
-            for j in range(col-1, -1, -1):
-                if(floor[i][j] == 1):
-                    print_F(floor, i, j)
-                    floor[i][j] = 0
-                print_F(floor, i, j)
-def print_F(floor, row, col):
-    """A function to print the GRID , (row, col) represent the current vacuum cleaner position"""
-    print("The Floor matrix is as below:")
-    for r in range(len(floor)):
-        for c in range(len(floor[r])):
-            if r == row and c == col:
-                print(f" >{floor[r][c]}< ", end = '')
-            else:
-                print(f"  {floor[r][c]}  ", end = '')
-        print(end = '\n')
-    print(end = '\n')
-def main():
-    floor = []
-    print("P MANYA")
-    m = int(input("Enter the No. of Rows: "))
-    n = int(input("Enter the No. of Columns: "))
-    print("Enter clean status for each cell (1 - dirty, 0 - clean)")
-    for i in range(m):
-        f = list(map(int, input().split(" ")))
-        floor.append(f)
-    print()
 
-    clean(floor)
+import random
 
+def initialize_board():
+return [[' ' for _ in range(3)] for _ in range(3)]
 
-main()
+def display_board(board): for row in board:
+print('|'.join(row))
+print('-' * 5)
 
-def clean(floor):
-    i, j, row, col = 0, 0, len(floor), len(floor[0])
-    for i in range(row):
-        if(i%2 == 0):
-            for j in range(col):
-                if(floor[i][j] == 1):
-                    print_F(floor, i, j)
-                    floor[i][j] = 0
-                print_F(floor, i, j)
-        else:
-            for j in range(col-1, -1, -1):
-                if(floor[i][j] == 1):
-                    print_F(floor, i, j)
-                    floor[i][j] = 0
-                print_F(floor, i, j)
-def print_F(floor, row, col):
-    """A function to print the GRID , (row, col) represent the current vacuum cleaner position"""
-    print("The Floor matrix is as below:")
-    for r in range(len(floor)):
-        for c in range(len(floor[r])):
-            if r == row and c == col:
-                print(f" >{floor[r][c]}< ", end = '')
-            else:
-                print(f"  {floor[r][c]}  ", end = '')
-        print(end = '\n')
-    print(end = '\n')
-def main():
-    floor = []
-    print("P MANYA")
-    m = int(input("Enter the No. of Rows: "))
-    n = int(input("Enter the No. of Columns: "))
-    print("Enter clean status for each cell (1 - dirty, 0 - clean)")
-    for i in range(m):
-        f = list(map(int, input().split(" ")))
-        floor.append(f)
-    print()
+def check_winner(board): for row in board:
+if row[0] == row[1] == row[2] != ' ': return row[0]
+for col in range(3):
+if board[0][col] == board[1][col] == board[2][col] != ' ': return board[0][col]
+if board[0][0] == board[1][1] == board[2][2] != ' ': return board[0][0]
+if board[0][2] == board[1][1] == board[2][0] != ' ': return board[0][2]
+return None
 
-    clean(floor)
+def available_moves(board):
+return [(i, j) for i in range(3) for j in range(3) if board[i][j] == ' ']
 
+def check_two_in_a_row(board, player): for row in range(3):
+if board[row].count(player) == 2 and board[row].count(' ') == 1: return row, board[row].index(' ')
+for col in range(3):
+ 
+if [board[row][col] for row in range(3)].count(player) == 2: empty_index = [row for row in range(3) if board[row][col] == ' '] if empty_index:
+return empty_index[0], col
+if [board[i][i] for i in range(3)].count(player) == 2: empty_index = [i for i in range(3) if board[i][i] == ' '] if empty_index:
+return empty_index[0], empty_index[0]
+if [board[i][2 - i] for i in range(3)].count(player) == 2: empty_index = [i for i in range(3) if board[i][2 - i] == ' '] if empty_index:
+return empty_index[0], 2 - empty_index[0] return None
 
-main()
+def make_move(board, player, move): board[move[0]][move[1]] = player
+
+def computer_move(board):
+move = check_two_in_a_row(board, 'O') if move:
+make_move(board, 'O', move) return
+move = check_two_in_a_row(board, 'X') if move:
+make_move(board, 'O', move) return
+moves = available_moves(board) if moves:
+move = random.choice(moves) make_move(board, 'O', move)
+
+def user_move(board):
+ 
+while True: try:
+row = int(input("Enter row (0-2): ")) col = int(input("Enter column (0-2): ")) if board[row][col] == ' ':
+make_move(board, 'X', (row, col)) return
+else:
+print("That spot is already taken. Try again.") except (ValueError, IndexError):
+print("Invalid input. Please enter numbers between 0 and 2.")
+
+def play_game():
+board = initialize_board() players = ['X', 'O'] current_player = 0
+for _ in range(9): display_board(board) if current_player == 0:
+user_move(board) else:
+computer_move(board) winner = check_winner(board) if winner:
+display_board(board) print(f"Player {winner} wins!") return
+current_player = 1 - current_player display_board(board)
+print("It's a draw!")
+
+play_game()
+ 
+print(“P Manya”) print(“1BM22CS187”)
